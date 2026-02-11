@@ -31,5 +31,5 @@ main :: proc() {
 	_ = function
 	_ = label
 	
-	os.write_entire_file("test.spv", slice.reinterpret([]byte, b.data[:]))
+	_ = os.write_entire_file("test.spv", slice.reinterpret([]byte, b.data[:]))
 }
