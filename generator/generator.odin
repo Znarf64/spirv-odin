@@ -451,15 +451,15 @@ main :: proc() {
 		fmt.printfln("Usage: %s <grammar> <extension-1-name> <extension-1-grammar> ...", os.args[0])
 		os.exit(1)
 	}
-	
+
 	grammar: Grammar
 	err := json.unmarshal(
-		os.read_entire_file(os.args[1]) or_else panic("Failed to read json grammar file"),
+		os.read_entire_file(os.args[1], context.allocator) or_else panic("Failed to read json grammar file"),
 		&grammar,
 	)
 	assert(err == nil, "Failed to parse json grammar")
 	generated := generate_file(grammar)
-	os.write_entire_file("spirv_generated.odin", transmute([]byte)generated)
+	_ = os.write_entire_file("spirv_generated.odin", transmute([]byte)generated)
 	
 
 	for i := 2; i < len(os.args); i += 2 {
@@ -468,12 +468,12 @@ main :: proc() {
 
 		grammar: Grammar
 		err := json.unmarshal(
-			os.read_entire_file(path) or_else panic("Failed to read extension json grammar file"),
+			os.read_entire_file(path, context.allocator) or_else panic("Failed to read extension json grammar file"),
 			&grammar,
 		)
 		assert(err == nil, "Failed to parse json grammar")
 		generated := generate_extension(grammar, name)
 		os.make_directory(name)
-		os.write_entire_file(fmt.tprintf("%s/%s.odin", name, name), transmute([]byte)generated)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s.odin", name, name), transmute([]byte)generated)
 	}
 }
