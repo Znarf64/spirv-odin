@@ -30,6 +30,6 @@ main :: proc() {
 	_ = t_f32
 	_ = function
 	_ = label
-	
+
 	_ = os.write_entire_file("test.spv", slice.reinterpret([]byte, b.data[:]))
 }

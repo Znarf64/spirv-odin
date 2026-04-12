@@ -67,7 +67,7 @@ generate_file :: proc(grammar: Grammar) -> string {
 		name:  string,
 		value: int,
 	}
-	
+
 	values: [dynamic]Enum_Value
 	enums:  map[string]struct{ has_params: bool, }
 	for op_kind in grammar.operand_kinds {
@@ -86,7 +86,7 @@ generate_file :: proc(grammar: Grammar) -> string {
 		case "MatrixMultiplyAccumulateOperands":
 			skip = len("Matrix")
 		}
-		
+
 		clear(&values)
 		max_name_len: int
 		has_params:   bool
@@ -441,7 +441,7 @@ generate_extension :: proc(grammar: Grammar, package_name: string) -> string {
 		fmt.sbprintfln(&b, "}\n")
 	}
 	fmt.sbprintln(&ob, "}")
-	
+
 	fmt.sbprintln(&b, strings.to_string(ob))
 	return strings.to_string(b)
 }
@@ -460,7 +460,7 @@ main :: proc() {
 	assert(err == nil, "Failed to parse json grammar")
 	generated := generate_file(grammar)
 	_ = os.write_entire_file("spirv_generated.odin", transmute([]byte)generated)
-	
+
 
 	for i := 2; i < len(os.args); i += 2 {
 		name := os.args[i + 0]
