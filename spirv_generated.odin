@@ -1653,7 +1653,7 @@ OpConstantFalse :: proc(builder: ^Builder, result_type: Id) -> (result: Id) {
 	return builder.current_id^
 }
 
-OpConstant :: proc(builder: ^Builder, result_type: Id, value: u32) -> (result: Id) {
+OpConstant :: proc(builder: ^Builder, result_type: Id, value: ..u32) -> (result: Id) {
 	start := len(builder.data)
 	append(&builder.data, u32(Op.Constant))
 	defer builder.data[start] |= u32(len(builder.data) - start) << 16
@@ -1661,7 +1661,7 @@ OpConstant :: proc(builder: ^Builder, result_type: Id, value: u32) -> (result: I
 	append(&builder.data, u32(result_type))
 	assert(result_type != 0)
 	append(&builder.data, next_id(builder))
-	append(&builder.data, u32(value))
+	append(&builder.data, ..value)
 	return builder.current_id^
 }
 
@@ -1727,7 +1727,7 @@ OpSpecConstantFalse :: proc(builder: ^Builder, result_type: Id) -> (result: Id) 
 	return builder.current_id^
 }
 
-OpSpecConstant :: proc(builder: ^Builder, result_type: Id, value: u32) -> (result: Id) {
+OpSpecConstant :: proc(builder: ^Builder, result_type: Id, value: ..u32) -> (result: Id) {
 	start := len(builder.data)
 	append(&builder.data, u32(Op.SpecConstant))
 	defer builder.data[start] |= u32(len(builder.data) - start) << 16
@@ -1735,7 +1735,7 @@ OpSpecConstant :: proc(builder: ^Builder, result_type: Id, value: u32) -> (resul
 	append(&builder.data, u32(result_type))
 	assert(result_type != 0)
 	append(&builder.data, next_id(builder))
-	append(&builder.data, u32(value))
+	append(&builder.data, ..value)
 	return builder.current_id^
 }
 

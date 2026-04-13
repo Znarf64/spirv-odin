@@ -217,9 +217,13 @@ generate_file :: proc(grammar: Grammar) -> string {
 				case "LiteralString":
 					type = "string"
 					fmt.sbprintfln(bb, "write_string(&builder.data, %s)", name)
-				case "LiteralInteger", "LiteralExtInstInteger", "LiteralContextDependentNumber", "LiteralSpecConstantOpInteger":
+				case "LiteralInteger", "LiteralExtInstInteger", "LiteralSpecConstantOpInteger":
 					fmt.sbprintfln(bb, "append(&builder.data, u32(%s))", name)
 					type = "u32"
+				case "LiteralContextDependentNumber":
+					fmt.sbprintfln(bb, "append(&builder.data, ..%s)", name)
+					type         = "u32"
+					n_variadics += 1
 				case "IdResult":
 					name       = "result"
 					type       = "Id"
@@ -324,9 +328,12 @@ generate_file :: proc(grammar: Grammar) -> string {
 				case "LiteralString":
 					type = "string"
 					fmt.sbprintfln(bb, "write_string(&builder.data, %s)", name)
-				case "LiteralInteger", "LiteralExtInstInteger", "LiteralContextDependentNumber", "LiteralSpecConstantOpInteger":
+				case "LiteralInteger", "LiteralExtInstInteger", "LiteralSpecConstantOpInteger":
 					fmt.sbprintfln(bb, "append(&builder.data, u32(%s))", name)
 					type = "u32"
+				case "LiteralContextDependentNumber":
+					fmt.sbprintfln(bb, "append(&builder.data, ..%s)", name)
+					type = "..u32"
 				case "IdResult":
 					name       = "result"
 					type       = "Id"
