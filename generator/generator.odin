@@ -23,11 +23,13 @@ Grammar :: struct {
 		heading: string,
 	},
 	instructions: []struct {
-		opname:   string,
-		class:    string,
-		opcode:   u32,
-		operands: []Operand,
-		version:  string,
+		opname:       string,
+		class:        string,
+		opcode:       u32,
+		operands:     []Operand,
+		extensions:   []string,
+		capabilities: []string,
+		version:      string,
 	},
 	operand_kinds: []struct {
 		category:   enum {
@@ -41,11 +43,11 @@ Grammar :: struct {
 			enumerant:    string,
 			aliases:      []string,
 			value:        json.Value, // can either be string or an int
-			capabilities: []string,
 			parameters:   []struct {
 				kind: string,
 				name: string,
 			},
+			capabilities: []string,
 			extensions:   []string,
 			version:      string,
 		},
@@ -67,6 +69,11 @@ generate_file :: proc(grammar: Grammar) -> string {
 		name:  string,
 		value: int,
 	}
+
+	extension_map:  strings.Builder
+	capability_map: strings.Builder
+	fmt.sbprintln(&extension_map,  "op_extensions: #sparse [Op][]string = {")
+	fmt.sbprintln(&capability_map, "op_capabilties: #sparse [Op][]Capability = {")
 
 	values: [dynamic]Enum_Value
 	enums:  map[string]struct{ has_params: bool, }
@@ -160,6 +167,16 @@ generate_file :: proc(grammar: Grammar) -> string {
 		fmt.sbprint(&b, inst.opname, " :: proc(builder: ^Builder", sep = "")
 		fmt.sbprintfln(&ob, "\t%s = %v,", inst.opname[2:], inst.opcode)
 		has_result: bool
+
+		fmt.sbprintfln(&extension_map,  "\t.%v = %w,", inst.opname[2:], inst.extensions)
+		fmt.sbprintf(&capability_map, "\t.%v = {{", inst.opname[2:])
+		if len(inst.capabilities) != 0 {
+			fmt.sbprint(&capability_map, " ")
+		}
+		for cap in inst.capabilities {
+			fmt.sbprintf(&capability_map, ".%v, ", cap)
+		}
+		fmt.sbprint(&capability_map, "},\n")
 
 		handle_operand :: proc(
 			b:       ^strings.Builder,
@@ -408,6 +425,9 @@ generate_file :: proc(grammar: Grammar) -> string {
 
 	fmt.sbprintln(&ob, "}")
 	fmt.sbprint(&b, strings.to_string(ob))
+
+	fmt.sbprintfln(&b, "\n%s}}", strings.to_string(extension_map))
+	fmt.sbprintfln(&b, "\n%s}}", strings.to_string(capability_map))
 
 	return strings.to_string(b)
 }
